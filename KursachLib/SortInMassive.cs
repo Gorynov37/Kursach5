@@ -33,7 +33,20 @@ namespace KursachLib
 
         public void QuickSort(int left, int right)
         {
+            int p = left;
+            int L = left + 1;
+            int R = right;
 
+            while ((L <= right) && (mass[L] < mass[p])) L++;
+            while ((R >= left) && (mass[R] > mass[p])) R--;
+
+            if (R < L)
+            {
+                Swap(p, R);
+                QuickSort(left, R);
+                QuickSort(L, right);
+            }
+            else Swap(L, R);
         }
 
         public void SelectionSort(int left, int right)
