@@ -31,6 +31,27 @@ namespace KursachLib
             mass[second] = f;
         }
 
+        public void QuickSort(int left, int right)
+        {
 
+        }
+
+        public void SelectionSort(int left, int right)
+        {
+            for (int i = right; i >= left; i--)
+            {
+                Swap(i, FindMax(left, i));
+            }
+        }
+
+        public int FindMax(int left, int right)
+        {
+            int max = right;
+            for (int i = right - 1; i >= left; i--)
+            {
+                if (mass[i] > mass[max]) max = i;
+            }
+            return max;
+        }
     }
 }
