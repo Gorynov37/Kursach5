@@ -12,6 +12,13 @@ namespace KursachLib
         public Node<T> Prev { get; private set; }
         public Node<T> Next { get; private set; }
         
+        public static void Swap(Node<T> node1, Node<T> node2)
+        {
+            T value = node1.Element;
+            node1.Element = node2.Element;
+            node2.Element = value;
+        }
+
         public void SetNext(T value)
         {
             Node<T> node = Next;
@@ -34,7 +41,7 @@ namespace KursachLib
 
             return b1 || b2;
         }
-
+        
         public Node<T> Copy()
         {
             return new Node<T>(Element, Prev, Next);
