@@ -41,6 +41,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="List.cs" />
+    <Compile Include="Node.cs" />
+    <Compile Include="SortClass.cs" />
     <Compile Include="SortInMassive.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
