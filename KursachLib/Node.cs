@@ -6,50 +6,82 @@ using System.Threading.Tasks;
 
 namespace KursachLib
 {
-    class Node<T> : IComparable<Node<T>> where T : IComparable
+    public abstract class Node : IComparable<Node>
     {
-        public T Element { get; private set; }
-        public Node<T> Prev { get; private set; }
-        public Node<T> Next { get; private set; }
-        
-        public static void Swap(Node<T> node1, Node<T> node2)
+        public Node Prev { get; protected set; }
+        public Node Next { get; protected set; }
+        public void SetPrev(Node node)
         {
-            T value = node1.Element;
-            node1.Element = node2.Element;
-            node2.Element = value;
+            Node n = node.Copy();
+            n.Prev = Prev;
+            n.Next = this;
+            Prev.Next = n;
+            Prev = n;
         }
-
-        public void SetNext(T value)
+        public void SetNext(Node node)
         {
-            Node<T> node = Next;
-            Next = new Node<T>(value, this, node);
+            Node n = node.Copy();
+            n.Prev = Prev;
+            n.Next = this;
+            Prev.Next = n;
+            Prev = n;
         }
-
-        public void SetPrev(T value)
+        public Node Pop()
         {
-            Node<T> node = Prev;
-            Prev = new Node<T>(value, node, this);
-        }
-
-        public bool Pop()
-        {
+            Node node = this;
             bool b1 = this.Prev != null;
             bool b2 = this.Next != null;
 
             if (b1) Prev.Next = Next;
             if (b2) Next.Prev = Prev;
 
-            return b1 || b2;
+            node.Next = null;
+            node.Prev = null;
+
+            return node;
         }
-        
-        public Node<T> Copy()
+        public static void Swap(Node node1, Node node2) => node1.Swap(node2);
+        protected abstract void Swap(Node node);
+        public abstract Node Copy();
+        public abstract int CompareTo(Node value);
+        public static bool operator >(Node value1, Node value2) => value1.CompareTo(value2) > 0;
+        public static bool operator <(Node value1, Node value2) => value1.CompareTo(value2) < 0;
+        public static bool operator >=(Node value1, Node value2) => value1.CompareTo(value2) >= 0;
+        public static bool operator <=(Node value1, Node value2) => value1.CompareTo(value2) <= 0;
+    }
+
+    public class Node<T> : Node where T : IComparable
+    {
+        public T Element { get; private set; }
+        protected override void Swap(Node node)
         {
-            return new Node<T>(Element, Prev, Next);
+            if (!(node is Node<T> n)) throw new Exception("node as Node<T> = 0");
+
+            T value = n.Element;
+            n.Element = Element;
+            Element = value;
+        }
+
+        public void SetNext(T value)
+        {
+            Node node = Next;
+            Next = new Node<T>(value, this, (Node<T>)node);
+        }
+
+        public void SetPrev(T value)
+        {
+            Node node = Prev;
+            Prev = new Node<T>(value, (Node<T>)node, this);
+        }
+
+        public override Node Copy()
+        {
+            return new Node<T>(Element, Prev as Node<T>, Next as Node<T>);
         }
 
         public Node<T> Step(int count)
         {
-            Node<T> node = this.Copy();
+            Node node = this;
             if (count >= 0)
             {
                 for (int i = 0; i < count; i++)
@@ -66,7 +98,7 @@ namespace KursachLib
                     if (node == null) break;
                 }
             }
-            return node;
+            return node as Node<T>;
         }
 
         public Node()
@@ -88,10 +120,12 @@ namespace KursachLib
             Prev = prev;
         }
 
-        public int CompareTo(Node<T> value) => this.Element.CompareTo(value.Element);
-        public static bool operator >(Node<T> value1, Node<T> value2) => value1.Element.CompareTo(value2.Element) > 0;
-        public static bool operator <(Node<T> value1, Node<T> value2) => value1.Element.CompareTo(value2.Element) < 0;
-        public static bool operator >=(Node<T> value1, Node<T> value2) => value1.Element.CompareTo(value2.Element) >= 0;
-        public static bool operator <=(Node<T> value1, Node<T> value2) => value1.Element.CompareTo(value2.Element) <= 0;
+        public override int CompareTo(Node value)
+        {
+            if (value == null) throw new Exception("value == null");
+            if (!(value is Node<T> node)) throw new Exception("node == null");
+            else return this.Element.CompareTo(node.Element);
+        }
+        
     }
 }

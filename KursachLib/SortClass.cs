@@ -1,62 +1,107 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace KursachLib
 {
-    abstract class SortClass<T> where T : IComparable
+    public abstract class SortClass
     {
         public int comparisons;
         public int transpositions;
-        abstract public List<T> Sort(List<T> list);
+        abstract public void Sort(List list);
     }
 
-    class QuickSort<T> : SortClass<T> where T : IComparable
+    public class QuickSort : SortClass
     {
-        public override List<T> Sort(List<T> list)
+        public override void Sort(List list)
         {
-            //int p = left;
-            //int L = left + 1;
-            //int R = right;
+            comparisons = 0;
+            transpositions = 0;
 
-            //while ((L <= right) && (mass[L] < mass[p])) L++;
-            //while ((R >= left) && (mass[R] > mass[p])) R--;
-
-            //if (R < L)
-            //{
-            //    Swap(p, R);
-            //    QuickSort(left, R);
-            //    QuickSort(L, right);
-            //}
-            //else Swap(L, R);
-            return null;
+            QSort(list.FirstNode, list.LastNode);
         }
-    }
 
-    class SelectionSort<T> : SortClass<T> where T : IComparable
-    {
-        public override List<T> Sort(List<T> list)
+        public void QSort(Node left, Node right)
         {
-            Node<T> i = list.LastNode;
-            while (!(i == list.FirstNode))
+            if ((left == right) || (left == right.Next)) return;
+            Node p = left;
+            Node L = left.Next;
+            Node R = right;
+
+            while (L != right.Next)
             {
-                Node<T>.Swap(i, FindMax(list.FirstNode, i));
+                comparisons++;
+                if (L < p) L = L.Next;
+                else break;
             }
-            return list;
+
+
+            while (R != left)
+            {
+                comparisons++;
+                if (R >= p) R = R.Prev;
+                else break;
+
+            }
+
+            bool b = false;
+            Node node = R;
+            if ((R != L) && (R.Prev != L)) do
+            {
+                node = node.Next;
+                if (node == L)
+                {
+                    b = true;
+                    break;
+                }
+
+            } while (node != right.Next);
+
+
+            transpositions++;
+            if (b)
+            {
+                Node.Swap(p, R);
+                QSort(left, R);
+                QSort(L, right);
+            }
+            else
+            {
+                Node.Swap(L, R);
+                QSort(left, right);
+            }
+        }
+    }
+
+    public class SelectionSort : SortClass
+    {
+        public override void Sort(List list)
+        {
+            comparisons = 0;
+            transpositions = 0;
+            Node i = list.LastNode;
+            while (i != list.FirstNode)
+            {
+                transpositions++;
+                Node.Swap(i, FindMax(list.FirstNode, i));
+                i = i.Prev;
+            }
         }
 
-        public Node<T> FindMax(Node<T> left, Node<T> right)
+        public Node FindMax(Node left, Node right)
         {
-            Node<T> max = right;
-            Node<T> i = right.Prev;
+            Node max = right;
+            Node i = right.Prev;
 
-            while (!(i == left))
+            while (i != left)
             {
+                comparisons++;
                 if (i > max) max = i;
                 i = i.Prev;
             }
+            comparisons++;
+            if (left > max) max = left;
 
             return max;
         }

@@ -1,74 +1,134 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace KursachLib
 {
-    class List<T> where T : IComparable
+
+    public abstract class List
+    {
+        public int Length { get; protected set; }
+        public abstract Node FirstNode { get; protected set; }
+        public abstract Node LastNode { get; protected set; }
+        public abstract void Remove(Node node);
+        public abstract void Sort(SortClass sortObj);
+        public abstract List Copy();
+    }
+    public class List<T> : List where T : IComparable
     {
         private Node<T> firstNode;
         private Node<T> lastNode;
 
-        public int Length { get; private set; }
-        public Node<T> FirstNode
+        public override Node FirstNode
         {
             get
             {
                 return firstNode;
             }
-            private set
+            protected set
             {
-                firstNode = new Node<T>(value.Element, null, value.Next);
+
+                firstNode = new Node<T>((value as Node<T>).Element, null, value.Next as Node<T>);
             }
         }
-        public Node<T> LastNode
+        public override Node LastNode
         {
             get
             {
                 return lastNode;
             }
-            private set
+            protected set
             {
-                lastNode = new Node<T>(value.Element, value.Prev, null);
+                lastNode = new Node<T>((value as Node<T>).Element, value.Prev as Node<T>, null);
             }
+        }
+        public override void Remove(Node node)
+        {
+            node.Pop();
+            Length--;
         }
         public List()
         {
-            FirstNode = null;
-            LastNode = null;
+            firstNode = null;
+            lastNode = null;
             Length = 0;
         }
 
+
         public void PushFront(T value)
         {
-            lastNode.SetPrev(value);
-            lastNode = lastNode.Prev;
-            Length++;
+            if (Length == 0)
+            {
+                firstNode = new Node<T>(value);
+                lastNode = firstNode;
+                Length++;
+            }
+            else
+            {
+                firstNode.SetPrev(value);
+                firstNode = firstNode.Prev as Node<T>;
+                Length++;
+            }
         }
         public void PushBack(T value)
         {
-            lastNode.SetNext(value);
-            lastNode = lastNode.Next;
-            Length++;
+            if(Length == 0)
+            {
+                lastNode = new Node<T>(value);
+                firstNode = lastNode;
+                Length++;
+            }
+            else
+            {
+                lastNode.SetNext(value);
+                lastNode = lastNode.Next as Node<T>;
+                Length++;
+            }
         }
         public void PopBack()
         {
             if (Length == 0) return;
             Node<T> node = lastNode;
-            lastNode = lastNode.Prev;
-            if (node.Pop()) Length--;
+            lastNode = lastNode.Prev as Node<T>;
+            Remove(node);
         }
         public void PopFront()
         {
             if (Length == 0) return;
             Node<T> node = firstNode;
-            lastNode = lastNode.Next;
-            if (node.Pop()) Length--;
+            firstNode = firstNode.Next as Node<T>;
+            Remove(node);
         }
 
+        public override List Copy()
+        {
+            List<T> list = new List<T>();
+            Node<T> node = firstNode;
+            list.PushBack(node.Element);
 
+            while(node != lastNode)
+            {
+                node = node.Next as Node<T>;
+                list.PushBack(node.Element);
+            }
 
+            return list;
+        }
+        public override void Sort(SortClass sortObj) => sortObj.Sort(this);
+
+        public override string ToString()
+        {
+            string str = String.Empty;
+            Node<T> node = firstNode;
+            while (node != lastNode)
+            {
+                str += Convert.ToString(node.Element) + " ";
+                node = node.Next as Node<T>;
+            }
+            str += Convert.ToString(node.Element);
+
+            return str;
+        }
     }
 }
