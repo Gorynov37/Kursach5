@@ -24,53 +24,32 @@ namespace KursachLib
 
         public void QSort(Node left, Node right)
         {
-            if ((left == right) || (left == right.Next)) return;
-            Node p = left;
-            Node L = left.Next;
+            if ((left == null) || (right == null)) return;
+            if ((left == right) || (left == right.Next) || ((left.Prev == right))) return;
+
+            Node p = null;
             Node R = right;
 
-            while (L != right.Next)
+            while(R != left)
             {
                 comparisons++;
-                if (L < p) L = L.Next;
-                else break;
-            }
-
-
-            while (R != left)
-            {
-                comparisons++;
-                if (R >= p) R = R.Prev;
-                else break;
-
-            }
-
-            bool b = false;
-            Node node = R;
-            if ((R != L) && (R.Prev != L)) do
-            {
-                node = node.Next;
-                if (node == L)
+                if ((p == null) && (R < left)) p = R;
+                if ((p != null) && (R > left))
                 {
-                    b = true;
-                    break;
+                    transpositions++;
+                    Node.Swap(R, p);
+                    p = p.Prev;
                 }
-
-            } while (node != right.Next);
-
+                R = R.Prev;
+            }
+            if (p == null) p = left;
 
             transpositions++;
-            if (b)
-            {
-                Node.Swap(p, R);
-                QSort(left, R);
-                QSort(L, right);
-            }
-            else
-            {
-                Node.Swap(L, R);
-                QSort(left, right);
-            }
+            Node.Swap(p, R);
+
+            QSort(left, p.Prev);
+            QSort(p.Next, right);
+
         }
     }
 
