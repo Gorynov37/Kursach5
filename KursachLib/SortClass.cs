@@ -44,8 +44,11 @@ namespace KursachLib
             }
             if (p == null) p = left;
 
-            transpositions++;
-            Node.Swap(p, R);
+            if (p != R)
+            {
+                transpositions++;
+                Node.Swap(p, R);
+            }
 
             QSort(left, p.Prev);
             QSort(p.Next, right);
@@ -62,8 +65,13 @@ namespace KursachLib
             Node i = list.LastNode;
             while (i != list.FirstNode)
             {
-                transpositions++;
-                Node.Swap(i, FindMax(list.FirstNode, i));
+                
+                Node j = FindMax(list.FirstNode, i);
+                if (i != j) 
+                {
+                    transpositions++;
+                    Node.Swap(i, j);
+                }
                 i = i.Prev;
             }
         }
